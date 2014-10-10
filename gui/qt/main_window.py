@@ -121,7 +121,10 @@ class ElectrumWindow(QMainWindow):
         self.create_status_bar()
         self.need_update = threading.Event()
 
-        self.decimal_point = config.get('decimal_point', 5)
+	#updates for freicoin demurrage
+#        self.decimal_point = config.get('decimal_point', 121)
+	self.decimal_point = config.get('decimal_point', 8)	
+
         self.num_zeros     = int(config.get('num_zeros',0))
         self.invoices      = {}
 
@@ -206,7 +209,7 @@ class ElectrumWindow(QMainWindow):
         self.invoices = self.wallet.storage.get('invoices', {})
         self.accounts_expanded = self.wallet.storage.get('accounts_expanded',{})
         self.current_account = self.wallet.storage.get("current_account", None)
-        title = 'Electrum ' + self.wallet.electrum_version + '  -  ' + self.wallet.storage.path
+        title = 'FreiLectrum ' + self.wallet.electrum_version + '  -  ' + self.wallet.storage.path
         if self.wallet.is_watching_only(): title += ' [%s]' % (_('watching only'))
         self.setWindowTitle( title )
         self.update_wallet()
@@ -275,7 +278,7 @@ class ElectrumWindow(QMainWindow):
                 shutil.copy2(path, new_path)
                 QMessageBox.information(None,"Wallet backup created", _("A copy of your wallet file was created in")+" '%s'" % str(new_path))
             except (IOError, os.error), reason:
-                QMessageBox.critical(None,"Unable to create backup", _("Electrum was unable to copy your wallet file to the specified location.")+"\n" + str(reason))
+                QMessageBox.critical(None,"Unable to create backup", _("FreiLectrum was unable to copy your wallet file to the specified location.")+"\n" + str(reason))
 
 
     def new_wallet(self):
@@ -340,7 +343,7 @@ class ElectrumWindow(QMainWindow):
         tools_menu = menubar.addMenu(_("&Tools"))
 
         # Settings / Preferences are all reserved keywords in OSX using this as work around
-        tools_menu.addAction(_("Electrum preferences") if sys.platform == 'darwin' else _("Preferences"), self.settings_dialog)
+        tools_menu.addAction(_("FreiLectrum preferences") if sys.platform == 'darwin' else _("Preferences"), self.settings_dialog)
         tools_menu.addAction(_("&Network"), self.run_network_dialog)
         tools_menu.addAction(_("&Plugins"), self.plugins_dialog)
         tools_menu.addSeparator()
@@ -361,7 +364,7 @@ class ElectrumWindow(QMainWindow):
 
         help_menu = menubar.addMenu(_("&Help"))
         help_menu.addAction(_("&About"), self.show_about)
-        help_menu.addAction(_("&Official website"), lambda: webbrowser.open("http://electrum.org"))
+        help_menu.addAction(_("&Official website"), lambda: webbrowser.open("http://FreiCoin.US"))
         help_menu.addSeparator()
         help_menu.addAction(_("&Documentation"), lambda: webbrowser.open("http://electrum.org/documentation.html")).setShortcut(QKeySequence.HelpContents)
         help_menu.addAction(_("&Report Bug"), self.show_report_bug)
@@ -369,15 +372,15 @@ class ElectrumWindow(QMainWindow):
         self.setMenuBar(menubar)
 
     def show_about(self):
-        QMessageBox.about(self, "Electrum",
-            _("Version")+" %s" % (self.wallet.electrum_version) + "\n\n" + _("Electrum's focus is speed, with low resource usage and simplifying Bitcoin. You do not need to perform regular backups, because your wallet can be recovered from a secret phrase that you can memorize or write on paper. Startup times are instant because it operates in conjunction with high-performance servers that handle the most complicated parts of the Bitcoin system."))
+        QMessageBox.about(self, "FreiLectrum",
+            _("Version")+" %s" % (self.wallet.electrum_version) + "\n\n" + _("Electrum's focus is speed, with low resource usage and simplifying FreiCoin. You do not need to perform regular backups, because your wallet can be recovered from a secret phrase that you can memorize or write on paper. Startup times are instant because it operates in conjunction with high-performance servers that handle the most complicated parts of the FreiCoin system."))
 
     def show_report_bug(self):
-        QMessageBox.information(self, "Electrum - " + _("Reporting Bugs"),
-            _("Please report any bugs as issues on github:")+" <a href=\"https://github.com/spesmilo/electrum/issues\">https://github.com/spesmilo/electrum/issues</a>")
-
+        QMessageBox.information(self, "FreiLectrum - " + _("Reporting Bugs"),
+            _("Please report any bugs as issues on github:")+" <a href=\"https://github.com/joeswhite/electrum/tree/FreiLectrum(electrum-Freicoin)issues\">https://github.com/joeswhite/electrum/tree/FreiLectrum(electrum-Freicoin)issues</a>")
 
     def notify_transactions(self):
+#debug
         if not self.network or not self.network.is_connected():
             return
 
@@ -406,7 +409,7 @@ class ElectrumWindow(QMainWindow):
 
     def notify(self, message):
         if self.tray:
-            self.tray.showMessage("Electrum", message, QSystemTrayIcon.Information, 20000)
+            self.tray.showMessage("FreiLlectrum", message, QSystemTrayIcon.Information, 20000)
 
 
 
@@ -444,22 +447,36 @@ class ElectrumWindow(QMainWindow):
         run_hook('timer_actions')
 
     def format_amount(self, x, is_diff=False, whitespaces=False):
-        return format_satoshis(x, is_diff, self.num_zeros, self.decimal_point, whitespaces)
+	#debug
+	#update for freicoin demurrage
+	return format_satoshis(x, is_diff, self.num_zeros, self.decimal_point, whitespaces)
 
 
     def get_decimal_point(self):
         return self.decimal_point
 
+#debug
+#updates for freicoin demurrage
 
     def base_unit(self):
-        assert self.decimal_point in [2, 5, 8]
-        if self.decimal_point == 2:
-            return 'bits'
+        assert self.decimal_point in [1, 5, 8]
+        if self.decimal_point == 1:
+            return 'kria'
         if self.decimal_point == 5:
-            return 'mBTC'
+            return 'mFRC'
         if self.decimal_point == 8:
-            return 'BTC'
+            return 'FRC'
         raise Exception('Unknown base unit')
+
+#    def base_unit(self):
+#        assert self.decimal_point in [121, 124, 129]
+#        if self.decimal_point == 121:
+#            return 'kria'
+#        if self.decimal_point == 124:
+#            return 'mFRC'
+#        if self.decimal_point == 129:
+#            return 'FRC'
+#        raise Exception('Unknown base unit')
 
     def update_status(self):
         if not self.wallet:
@@ -625,6 +642,7 @@ class ElectrumWindow(QMainWindow):
 
 
     def update_history_tab(self):
+	#updates for freicoin demurrage
 
         self.history_list.clear()
         for item in self.wallet.get_tx_history(self.current_account):
@@ -648,16 +666,25 @@ class ElectrumWindow(QMainWindow):
                 icon = QIcon(":icons/confirmed.png")
 
             if value is not None:
+                #updates for freicoin demurrage
+
+#                value121 = (value * (10 ** 121))
+#		v_str = self.format_amount(value121, True, whitespaces=True)
                 v_str = self.format_amount(value, True, whitespaces=True)
             else:
                 v_str = '--'
 
+	    #updates for freicoin demurrage
             balance_str = self.format_amount(balance, whitespaces=True)
+#	    balance121 = (balance * (10 ** 121))
+#            balance_str = self.format_amount(balance121, whitespaces=True)
 
             if tx_hash:
                 label, is_default_label = self.wallet.get_label(tx_hash)
             else:
-                label = _('Pruned transaction outputs')
+		#updates for freicoin demurrage
+		label = _('Total demurrage & pruned tx')
+#                label = _('Pruned transaction outputs')
                 is_default_label = False
 
             item = QTreeWidgetItem( [ '', time_str, label, v_str, balance_str] )
@@ -864,7 +891,7 @@ class ElectrumWindow(QMainWindow):
         from paytoedit import PayToEdit
         self.amount_e = BTCAmountEdit(self.get_decimal_point)
         self.payto_e = PayToEdit(self)
-        self.payto_help = HelpButton(_('Recipient of the funds.') + '\n\n' + _('You may enter a Bitcoin address, a label from your list of contacts (a list of completions will be proposed), or an alias (email-like address that forwards to a Bitcoin address)'))
+        self.payto_help = HelpButton(_('Recipient of the funds.') + '\n\n' + _('You may enter a FreiCoin address, a label from your list of contacts (a list of completions will be proposed), or an alias (email-like address that forwards to a FreiCoin address)'))
         grid.addWidget(QLabel(_('Pay to')), 1, 0)
         grid.addWidget(self.payto_e, 1, 1, 1, 3)
         grid.addWidget(self.payto_help, 1, 4)
@@ -904,7 +931,7 @@ class ElectrumWindow(QMainWindow):
         self.fee_e = BTCAmountEdit(self.get_decimal_point)
         grid.addWidget(self.fee_e_label, 5, 0)
         grid.addWidget(self.fee_e, 5, 1, 1, 2)
-        msg = _('Bitcoin transactions are in general not free. A transaction fee is paid by the sender of the funds.') + '\n\n'\
+        msg = _('FreiCoin transactions are in general not free. A transaction fee is paid by the sender of the funds.') + '\n\n'\
               + _('The amount of fee can be decided freely by the sender. However, transactions with low fees take more time to be processed.') + '\n\n'\
               + _('A suggested fee is automatically added to this field. You may override it. The suggested fee increases with the size of the transaction.')
         self.fee_e_help = HelpButton(msg)
@@ -1005,6 +1032,8 @@ class ElectrumWindow(QMainWindow):
             return h[0:8] + '...' + h[-8:] + ":%d"%x.get('prevout_n') + u'\t' + "%s"%x.get('address')
 
         for item in self.pay_from:
+	    #added for demurrage accounting
+            #self.from_list.addTopLevelItem(QTreeWidgetItem( [format(item), self.format_amount(item['value']) ]))
             self.from_list.addTopLevelItem(QTreeWidgetItem( [format(item), self.format_amount(item['value']) ]))
 
     def update_completions(self):
@@ -1044,12 +1073,12 @@ class ElectrumWindow(QMainWindow):
 
         for type, addr, amount in outputs:
             if addr is None:
-                QMessageBox.warning(self, _('Error'), _('Bitcoin Address is None'), _('OK'))
+                QMessageBox.warning(self, _('Error'), _('FreiCoin Address is None'), _('OK'))
                 return
             if type == 'op_return':
                 continue
             if type == 'address' and not bitcoin.is_address(addr):
-                QMessageBox.warning(self, _('Error'), _('Invalid Bitcoin Address'), _('OK'))
+                QMessageBox.warning(self, _('Error'), _('Invalid FreiCoin Address'), _('OK'))
                 return
             if amount is None:
                 QMessageBox.warning(self, _('Error'), _('Invalid Amount'), _('OK'))
@@ -1061,7 +1090,12 @@ class ElectrumWindow(QMainWindow):
             return
 
         amount = sum(map(lambda x:x[2], outputs))
+	#debug
+	#update for freicoin demurrage
+	#str(round((Decimal(out["confirmed"])/(10 ** 121)/100000000), 8))
+        #confirm_amount = self.config.get('confirm_amount', 100000000)
         confirm_amount = self.config.get('confirm_amount', 100000000)
+#	confirm_amount = round(self.config.get('confirm_amount', int(10 ** 121)), 8)
         if amount >= confirm_amount:
             o = '\n'.join(map(lambda x:x[1], outputs))
             if not self.question(_("send %(amount)s to %(address)s?")%{ 'amount' : self.format_amount(amount) + ' '+ self.base_unit(), 'address' : o}):
@@ -1093,6 +1127,7 @@ class ElectrumWindow(QMainWindow):
             if not self.question(_("A fee of %(fee)s will be added to this transaction.\nProceed?")%{ 'fee' : self.format_amount(fee) + ' '+ self.base_unit()}):
                 return
         else:
+	    #debug
             confirm_fee = self.config.get('confirm_fee', 100000)
             if fee >= confirm_fee:
                 if not self.question(_("The fee for this transaction seems unusually high.\nAre you really sure you want to pay %(fee)s in fees?")%{ 'fee' : self.format_amount(fee) + ' '+ self.base_unit()}):
@@ -1235,7 +1270,7 @@ class ElectrumWindow(QMainWindow):
         try:
             address, amount, label, message, request_url = util.parse_URI(URI)
         except Exception as e:
-            QMessageBox.warning(self, _('Error'), _('Invalid bitcoin URI:') + '\n' + str(e), _('OK'))
+            QMessageBox.warning(self, _('Error'), _('Invalid freicoin URI:') + '\n' + str(e), _('OK'))
             return
 
         self.tabs.setCurrentIndex(1)
@@ -1808,7 +1843,7 @@ class ElectrumWindow(QMainWindow):
         vbox.addWidget(QLabel(_('Account name')+':'))
         e = QLineEdit()
         vbox.addWidget(e)
-        msg = _("Note: Newly created accounts are 'pending' until they receive bitcoins.") + " " \
+        msg = _("Note: Newly created accounts are 'pending' until they receive FreiCoins.") + " " \
             + _("You will need to wait for 2 confirmations until the correct balance is displayed and more addresses are created for that account.")
         l = QLabel(msg)
         l.setWordWrap(True)
@@ -2120,7 +2155,7 @@ class ElectrumWindow(QMainWindow):
                 return Transaction.deserialize(txt)
             except:
                 traceback.print_exc(file=sys.stdout)
-                QMessageBox.critical(None, _("Unable to parse transaction"), _("Electrum was unable to parse your transaction"))
+                QMessageBox.critical(None, _("Unable to parse transaction"), _("FreiLectrum was unable to parse your transaction"))
                 return
 
         try:
@@ -2133,7 +2168,7 @@ class ElectrumWindow(QMainWindow):
             return tx
         except Exception:
             traceback.print_exc(file=sys.stdout)
-            QMessageBox.critical(None, _("Unable to parse transaction"), _("Electrum was unable to parse your transaction"))
+            QMessageBox.critical(None, _("Unable to parse transaction"), _("FreiLectrum was unable to parse your transaction"))
 
 
     def read_tx_from_qrcode(self):
@@ -2165,7 +2200,7 @@ class ElectrumWindow(QMainWindow):
             with open(fileName, "r") as f:
                 file_content = f.read()
         except (ValueError, IOError, os.error), reason:
-            QMessageBox.critical(None, _("Unable to read file or no transaction found"), _("Electrum was unable to open your transaction file") + "\n" + str(reason))
+            QMessageBox.critical(None, _("Unable to read file or no transaction found"), _("FreiLectrum was unable to open your transaction file") + "\n" + str(reason))
 
         return self.tx_from_text(file_content)
 
@@ -2213,11 +2248,14 @@ class ElectrumWindow(QMainWindow):
                 if not bitcoin.is_address(address):
                     errors.append((position, address))
                     continue
+		#debug
                 amount = Decimal(row[1])
+		#updates for freicoin demurrage
                 amount = int(100000000*amount)
+#                amount = int((10 ** 121)*amount)
                 outputs.append(('address', address, amount))
         except (ValueError, IOError, os.error), reason:
-            QMessageBox.critical(None, _("Unable to read file or no transaction found"), _("Electrum was unable to open your transaction file") + "\n" + str(reason))
+            QMessageBox.critical(None, _("Unable to read file or no transaction found"), _("FreiLectrum was unable to open your transaction file") + "\n" + str(reason))
             return
         if errors != []:
             for x in errors:
@@ -2242,7 +2280,7 @@ class ElectrumWindow(QMainWindow):
                 csvReader = csv.reader(f)
                 self.do_process_from_csvReader(csvReader)
         except (ValueError, IOError, os.error), reason:
-            QMessageBox.critical(None, _("Unable to read file or no transaction found"), _("Electrum was unable to open your transaction file") + "\n" + str(reason))
+            QMessageBox.critical(None, _("Unable to read file or no transaction found"), _("FreiLectrum was unable to open your transaction file") + "\n" + str(reason))
             return
 
     def do_process_from_csv_text(self):
@@ -2276,7 +2314,7 @@ class ElectrumWindow(QMainWindow):
         e.setReadOnly(True)
         vbox.addWidget(e)
 
-        defaultname = 'electrum-private-keys.csv'
+        defaultname = 'freilectrum-private-keys.csv'
         select_msg = _('Select file to export your private keys to')
         hbox, filename_e, csv_button = filename_field(self, self.config, defaultname, select_msg)
         vbox.addLayout(hbox)
@@ -2317,7 +2355,7 @@ class ElectrumWindow(QMainWindow):
         try:
             self.do_export_privkeys(filename, private_keys, csv_button.isChecked())
         except (IOError, os.error), reason:
-            export_error_label = _("Electrum was unable to produce a private key-export.")
+            export_error_label = _("FreiLectrum was unable to produce a private key-export.")
             QMessageBox.critical(None, _("Unable to create csv"), export_error_label + "\n" + str(reason))
 
         except Exception as e:
@@ -2350,19 +2388,19 @@ class ElectrumWindow(QMainWindow):
                 self.wallet.set_label(key, value)
             QMessageBox.information(None, _("Labels imported"), _("Your labels were imported from")+" '%s'" % str(labelsFile))
         except (IOError, os.error), reason:
-            QMessageBox.critical(None, _("Unable to import labels"), _("Electrum was unable to import your labels.")+"\n" + str(reason))
+            QMessageBox.critical(None, _("Unable to import labels"), _("FreiLectrum was unable to import your labels.")+"\n" + str(reason))
 
 
     def do_export_labels(self):
         labels = self.wallet.labels
         try:
-            fileName = self.getSaveFileName(_("Select file to save your labels"), 'electrum_labels.dat', "*.dat")
+            fileName = self.getSaveFileName(_("Select file to save your labels"), 'freilectrum_labels.dat', "*.dat")
             if fileName:
                 with open(fileName, 'w+') as f:
                     json.dump(labels, f)
                 QMessageBox.information(None, _("Labels exported"), _("Your labels where exported to")+" '%s'" % str(fileName))
         except (IOError, os.error), reason:
-            QMessageBox.critical(None, _("Unable to export labels"), _("Electrum was unable to export your labels.")+"\n" + str(reason))
+            QMessageBox.critical(None, _("Unable to export labels"), _("FreiLectrum was unable to export your labels.")+"\n" + str(reason))
 
 
     def export_history_dialog(self):
@@ -2372,7 +2410,7 @@ class ElectrumWindow(QMainWindow):
         d.setMinimumSize(400, 200)
         vbox = QVBoxLayout(d)
 
-        defaultname = os.path.expanduser('~/electrum-history.csv')
+        defaultname = os.path.expanduser('~/freilectrum-history.csv')
         select_msg = _('Select file to export your wallet transactions to')
 
         hbox, filename_e, csv_button = filename_field(self, self.config, defaultname, select_msg)
@@ -2392,7 +2430,7 @@ class ElectrumWindow(QMainWindow):
         try:
             self.do_export_history(self.wallet, filename, csv_button.isChecked())
         except (IOError, os.error), reason:
-            export_error_label = _("Electrum was unable to produce a transaction export.")
+            export_error_label = _("FreiLectrum was unable to produce a transaction export.")
             QMessageBox.critical(self, _("Unable to export history"), export_error_label + "\n" + str(reason))
             return
 
@@ -2525,7 +2563,7 @@ class ElectrumWindow(QMainWindow):
     def settings_dialog(self):
         self.need_restart = False
         d = QDialog(self)
-        d.setWindowTitle(_('Electrum Settings'))
+        d.setWindowTitle(_('FreiLectrum Settings'))
         d.setModal(1)
         vbox = QVBoxLayout()
         grid = QGridLayout()
@@ -2583,27 +2621,39 @@ class ElectrumWindow(QMainWindow):
         fee_e.editingFinished.connect(on_fee)
         widgets.append((fee_label, fee_e, fee_help))
 
-        units = ['BTC', 'mBTC', 'bits']
+        units = ['FRC', 'mFRC', 'kria']
         unit_label = QLabel(_('Base unit') + ':')
         unit_combo = QComboBox()
         unit_combo.addItems(units)
         unit_combo.setCurrentIndex(units.index(self.base_unit()))
         msg = _('Base unit of your wallet.')\
-              + '\n1BTC=1000mBTC.\n' \
+              + '\n1FRC=1000mFRC.\n' \
               + _(' These settings affects the fields in the Send tab')+' '
         unit_help = HelpButton(msg)
         def on_unit(x):
             unit_result = units[unit_combo.currentIndex()]
             if self.base_unit() == unit_result:
                 return
-            if unit_result == 'BTC':
-                self.decimal_point = 8
-            elif unit_result == 'mBTC':
-                self.decimal_point = 5
-            elif unit_result == 'bits':
-                self.decimal_point = 2
-            else:
-                raise Exception('Unknown base unit')
+#debug
+#updates for freicoin demurrage
+#            if unit_result == 'FRC':
+#                self.decimal_point = 8
+#            elif unit_result == 'mFRC':
+#                self.decimal_point = 5
+#            elif unit_result == 'kria':
+#                self.decimal_point = 2
+#            else:
+#                raise Exception('Unknown base unit')
+
+            if self.decimal_point == 121:
+            	return 'kria'
+            elif self.decimal_point == 124:
+            	return 'mFRC'
+            elif self.decimal_point == 129:
+            	return 'FRC'
+	    else:
+	        raise Exception('Unknown base unit')
+
             self.config.set_key('decimal_point', self.decimal_point, True)
             self.update_history_tab()
             self.update_receive_tab()
@@ -2688,13 +2738,13 @@ class ElectrumWindow(QMainWindow):
 
         run_hook('close_settings_dialog')
         if self.need_restart:
-            QMessageBox.warning(self, _('Success'), _('Please restart Electrum to activate the new GUI settings'), _('OK'))
+            QMessageBox.warning(self, _('Success'), _('Please restart FreiLectrum to activate the new GUI settings'), _('OK'))
 
 
 
     def run_network_dialog(self):
         if not self.network:
-            QMessageBox.warning(self, _('Offline'), _('You are using Electrum in offline mode.\nRestart Electrum if you want to get connected.'), _('OK'))
+            QMessageBox.warning(self, _('Offline'), _('You are using FreiLectrum in offline mode.\nRestart FreiLectrum if you want to get connected.'), _('OK'))
             return
         NetworkDialog(self.wallet.network, self.config, self).do_exec()
 
@@ -2713,7 +2763,7 @@ class ElectrumWindow(QMainWindow):
         from electrum.plugins import plugins
 
         d = QDialog(self)
-        d.setWindowTitle(_('Electrum Plugins'))
+        d.setWindowTitle(_('FreiLectrum Plugins'))
         d.setModal(1)
 
         vbox = QVBoxLayout(d)

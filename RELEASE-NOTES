@@ -1,3 +1,15 @@
+# FreiLectrum pre-alpha 0.001
+ * First working freicoin version
+
+ * Many items left to do
+
+ * Author Joseph White
+
+ * USE AT YOUR OWN RISK DURING FINAL DEVELOPMENT
+
+ * should work as is
+
+
 # Release 2.0
 
  * New address derivation (BIP39 + BIP32 + BIP44).

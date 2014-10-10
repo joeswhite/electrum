@@ -42,14 +42,15 @@ def print_json(obj):
     sys.stdout.flush()
 
 def user_dir():
+    #updates for freicoin
     if "HOME" in os.environ:
-        return os.path.join(os.environ["HOME"], ".electrum")
+        return os.path.join(os.environ["HOME"], ".freilectrum")
     elif "APPDATA" in os.environ:
-        return os.path.join(os.environ["APPDATA"], "Electrum")
+        return os.path.join(os.environ["APPDATA"], "FreiLectrum")
     elif "LOCALAPPDATA" in os.environ:
-        return os.path.join(os.environ["LOCALAPPDATA"], "Electrum")
+        return os.path.join(os.environ["LOCALAPPDATA"], "FreiLlectrum")
     elif 'ANDROID_DATA' in os.environ:
-        return "/sdcard/electrum/"
+        return "/sdcard/freilectrum/"
     else:
         #raise Exception("No home directory found in environment variables.")
         return
@@ -64,17 +65,17 @@ def data_dir():
 
 
 def appdata_dir():
-    """Find the path to the application data directory; add an electrum folder and return path."""
+    """Find the path to the application data directory; add a freilectrum folder and return path."""
     if platform.system() == "Windows":
-        return os.path.join(os.environ["APPDATA"], "Electrum")
+        return os.path.join(os.environ["APPDATA"], "FreiLectrum")
     elif platform.system() == "Linux":
-        return os.path.join(sys.prefix, "share", "electrum")
+        return os.path.join(sys.prefix, "share", "freilectrum")
     elif (platform.system() == "Darwin" or
           platform.system() == "DragonFly" or
           platform.system() == "OpenBSD" or
           platform.system() == "FreeBSD" or
 	  platform.system() == "NetBSD"):
-        return "/Library/Application Support/Electrum"
+        return "/Library/Application Support/FreiLlectrum"
     else:
         raise Exception("Unknown system")
 
@@ -91,7 +92,11 @@ def local_data_dir():
     return local_data
 
 
+#debug
+#updates for freicoin demurrage
+#def format_satoshis(x, is_diff=False, num_zeros = 0, decimal_point = 8, whitespaces=False):
 def format_satoshis(x, is_diff=False, num_zeros = 0, decimal_point = 8, whitespaces=False):
+
     from decimal import Decimal
     s = Decimal(x)
     sign, digits, exp = s.as_tuple()
@@ -110,6 +115,8 @@ def format_satoshis(x, is_diff=False, num_zeros = 0, decimal_point = 8, whitespa
     if whitespaces:
         s += " "*( 1 + decimal_point - ( len(s) - p ))
         s = " "*( 13 - decimal_point - ( p )) + s
+
+    #print(s)
     return s
 
 
@@ -192,10 +199,16 @@ def parse_URI(uri):
         am = pq['amount'][0]
         m = re.match('([0-9\.]+)X([0-9])', am)
         if m:
+
+	    #updates for freicoin demurrage
             k = int(m.group(2)) - 8
+#            k = int(m.group(2)) - 121
             amount = Decimal(m.group(1)) * pow(  Decimal(10) , k)
         else:
-            amount = Decimal(am) * 100000000
+	    #updates for freicoin demurrage
+#	    amount = (Decimal(am) * (10 ** 121))
+	    amount = Decimal(am) * 100000000
+
     if 'message' in pq:
         message = pq['message'][0]
     if 'label' in pq:

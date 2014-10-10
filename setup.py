@@ -13,7 +13,7 @@ version = imp.load_source('version', 'lib/version.py')
 util = imp.load_source('version', 'lib/util.py')
 
 if sys.version_info[:3] < (2, 6, 0):
-    sys.exit("Error: Electrum requires Python version >= 2.6.0...")
+    sys.exit("Error: FreiLectrum requires Python version >= 2.6.0...")
 
 usr_share = '/usr/share'
 if not os.access(usr_share, os.W_OK):
@@ -58,7 +58,7 @@ for lang in os.listdir('data/wordlist'):
 
 
 setup(
-    name="Electrum",
+    name="FreiLectrum",
     version=version.ELECTRUM_VERSION,
     install_requires=[
         'slowaes',
@@ -134,10 +134,10 @@ setup(
         'electrum_plugins.trezor',
         'electrum_plugins.virtualkeyboard',
     ],
-    description="Lightweight Bitcoin Wallet",
-    author="Thomas Voegtlin",
-    author_email="thomasv1@gmx.de",
+    description="Lightweight FreiCoin Wallet",
+    author="Joseph White",
+    author_email="joe@freicoin.us",
     license="GNU GPLv3",
-    url="https://electrum.org",
-    long_description="""Lightweight Bitcoin Wallet"""
+    url="http://FreiCoin.US",
+    long_description="""Lightweight FreiCoin Wallet"""
 )

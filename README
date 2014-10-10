@@ -1,23 +1,30 @@
-Electrum - lightweight Bitcoin client
+FreiLectrum - lightweight FreiCoin client
 
 Licence: GNU GPL v3
-Author: Thomas Voegtlin
+Authors: Joseph White (FreiLectrum) Thomas Voegtlin(electrum)
 Language: Python
-Homepage: https://electrum.org/
+Homepage: https://freicoin.us/
 
+
+0. FreiLectrum ALPHA INFO
+------------------------
+
+FreiLectrum pre-alpha v0.001 should work as is, however BACK UP YOUR CURRENT ELECTRUM CLIENT AND WALLET!
+
+There has not yet been testing of the android wallet, however it should work. again BACK UP YOUR CURRENT ELECTRUM CLIENT AND WALLET
 
 1. GETTING STARTED
 ------------------
 
-To run Electrum from this directory, just do:
+To run FreiLectrum from this directory, just do:
 
-  ./electrum
+  ./freilectrum
 
 If you install Electrum on your system, you can run it from any
 directory:
 
   sudo python setup.py install
-  electrum
+  freilectrum
 
 
 To start Electrum from your web browser, see

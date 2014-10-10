@@ -2,13 +2,13 @@
 # sudo desktop-file-install electrum.desktop
 
 [Desktop Entry]
-Comment=Lightweight Bitcoin Client
-Exec=electrum %u
-GenericName[en_US]=Electrum
-GenericName=Electrum
+Comment=Lightweight FreiCoin Client
+Exec=freilectrum %u
+GenericName[en_US]=FreiLlectrum
+GenericName=FreiLectrum
 Icon=/usr/share/app-install/icons/electrum.png
-Name[en_US]=Electrum Bitcoin Wallet
-Name=Electrum Bitcoin Wallet
+Name[en_US]=FreiLectrum FreiCoin Wallet
+Name=FreiLectrum FreiCoin Wallet
 Categories=Network;
 StartupNotify=false
 Terminal=false

@@ -1,7 +1,9 @@
 #!/usr/bin/env python2
 #
-# Electrum - lightweight Bitcoin client
+# FreiLectrum - lightweight FreiCoin client
 # Copyright (C) 2011 thomasv@gitorious
+#
+# Updates copyright 2014 joe@freicoin.us
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -98,8 +100,8 @@ def arg_parser():
 
 def print_help(parser):
     parser.print_help()
-    print_msg("Type 'electrum help <command>' to see the help for a specific command")
-    print_msg("Type 'electrum --help' to see the list of options")
+    print_msg("Type 'freilectrum help <command>' to see the help for a specific command")
+    print_msg("Type 'freilectrum --help' to see the list of options")
     run_command(known_commands['help'])
 
 
@@ -218,7 +220,7 @@ if __name__ == '__main__':
     if cmd == 'daemon':
         arg = args[1] if len(args)>1 else None
         if arg not in ['start', 'stop', 'status']:
-            print_msg("syntax: electrum daemon <start|status|stop>")
+            print_msg("syntax: freilectrum daemon <start|status|stop>")
             sys.exit(1)
         s = get_daemon(config, False)
         if arg == 'start':
@@ -331,7 +333,7 @@ if __name__ == '__main__':
 
     if cmd.name not in ['create', 'restore'] and cmd.requires_wallet and not storage.file_exists:
         print_msg("Error: Wallet file not found.")
-        print_msg("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+        print_msg("Type 'freilectrum create' to create a new wallet, or provide a path to a wallet with the -w option")
         sys.exit(0)
 
 

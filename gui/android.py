@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Electrum - lightweight Bitcoin client
+# FreiLectrum - lightweight FreiCoin client
 # Copyright (C) 2011 thomasv@gitorious
 #
 # This program is free software: you can redistribute it and/or modify
@@ -453,7 +453,7 @@ def pay_to(recipient, amount, fee, label):
     else:
         password = None
 
-    droid.dialogCreateSpinnerProgress("Electrum", "signing transaction...")
+    droid.dialogCreateSpinnerProgress("FreiLectrum", "signing transaction...")
     droid.dialogShow()
 
     try:
@@ -595,7 +595,7 @@ def payto_loop():
                 amount = droid.fullQueryDetail('amount').result.get('text')
 
                 if not is_valid(recipient):
-                    modal_dialog('Error','Invalid Bitcoin address')
+                    modal_dialog('Error','Invalid FreiCoin address')
                     continue
 
                 try:

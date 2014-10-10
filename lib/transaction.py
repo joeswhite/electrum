@@ -26,6 +26,13 @@ from util import print_error
 import time
 import struct
 
+#import wallet for demurrage function
+import wallet
+import math
+
+#import network for height
+import network
+
 #
 # Workalike python implementation of Bitcoin's CDataStream class.
 #
@@ -483,7 +490,10 @@ def deserialize(raw):
     n_vin = vds.read_compact_size()
     d['inputs'] = []
     for i in xrange(n_vin):
+	#debug
         d['inputs'].append(parse_input(vds))
+	#print(d['inputs'].append(parse_input(vds)))
+	
     n_vout = vds.read_compact_size()
     d['outputs'] = []
     for i in xrange(n_vout):
@@ -519,6 +529,8 @@ class Transaction:
         self.inputs = d['inputs']
         self.outputs = map(lambda x: (x['type'], x['address'], x['value']), d['outputs'])
         self.locktime = d['lockTime']
+	#debug
+	#print(self.outputs)
 
     @classmethod 
     def sweep(klass, privkeys, network, to_address, fee):
@@ -545,8 +557,11 @@ class Transaction:
 
         total = sum( map(lambda x:int(x.get('value')), inputs) ) - fee
         outputs = [('address', to_address, total)]
+	#print(outputs)
         self = klass(inputs, outputs)
         self.sign({ pubkey:privkey })
+	#debug
+	#print(self)
         return self
 
     @classmethod
@@ -576,7 +591,7 @@ class Transaction:
 
         return s
 
-
+#debug
     @classmethod
     def pay_script(self, type, addr):
         if type == 'op_return':
@@ -585,6 +600,7 @@ class Transaction:
         else:
             assert type == 'address'
         addrtype, hash_160 = bc_address_to_hash_160(addr)
+	#debug
         if addrtype == 0:
             script = '76a9'                                      # op_dup, op_hash_160
             script += push_script(hash_160.encode('hex'))
@@ -595,6 +611,7 @@ class Transaction:
             script += '87'                                       # op_equal
         else:
             raise
+	#print(script)
         return script
 
 
@@ -605,9 +622,18 @@ class Transaction:
         #   None : add all signatures
 
         inputs = self.inputs
+
+	#debug
+#	print(inputs)
+
         outputs = self.outputs
 
-        s  = int_to_hex(1,4)                                         # version
+
+	#debug
+#	print(outputs)
+
+	#freicoin has version 2 txn
+        s  = int_to_hex(2,4)                                         # version
         s += var_int( len(inputs) )                                  # number of inputs
         for i in range(len(inputs)):
             txin = inputs[i]
@@ -661,14 +687,55 @@ class Transaction:
 
         s += var_int( len(outputs) )                                 # number of outputs
         for output in outputs:
+	    #debug
+            #('address', '15jcCaHHqrFnNVGhs9ffAojJhPPTMQYf6R', 2200000000)
+	    #demurrage accounting
+	    #wallet.demurrage(amount, inputHeight)
+
             type, addr, amount = output
-            s += int_to_hex( amount, 8)                              # amount
+#	    demurraged
+#	    amount8 = int(str(amount)[:-121])
+#	    amount121 = amount * (10 ** 121)
+            s += int_to_hex( amount, 8 )                              # amount
+
+#            s += int_to_hex( amount121, 121 )                              # amount
             script = self.pay_script(type, addr)
             s += var_int( len(script)/2 )                           #  script length
             s += script                                             #  script
         s += int_to_hex(0,4)                                        #  lock time
+	#added refheight for freicoin demurrage accouting
+
+	#get everything ready for server heights
+	net = network.Network()
+        #this will be the highest blockchain_headers (either you or the server)
+        self.currentHeight = 0
+        #the wallets blockchain_headers height
+        self.localHeight = net.get_local_height() + 1 #may need to be + 1
+        #the server's blockchain_headers height
+        self.serverHeight = net.get_server_height() + 1
+
+        #bring it to 121 decimal places for freicoin demurrage precision
+        #oldValue = oldValue * (10 ** 121)
+        #round back down so we can get the tx to a better state
+        #oldValue = round(oldValue, 8)
+
+        #checks for the longest chain report to give most accurate and rapid demurrage reading
+        #checks to see who has the longest blockchain_headers, our local wallet, or the server
+        if (self.localHeight >= self.serverHeight):
+                #we have the longest blockchain_headers on our local wallet, we will use that
+                #this is the highest blockchain_headers block count, we have the longest chain
+                currentHeight = self.localHeight
+        #otherwise, we can assume that the server has the longest blockchain_headers, we will use that
+        else:
+
+		currentHeight = self.serverHeight
+
+	s += int_to_hex(currentHeight, 4)
+
         if for_sig is not None and for_sig != -1:
             s += int_to_hex(1, 4)                                   #  hash type
+
+	#print(s)
         return s
 
     def tx_for_sig(self,i):

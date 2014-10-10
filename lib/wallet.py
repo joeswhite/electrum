@@ -192,6 +192,95 @@ class Abstract_Wallet(object):
         if self.storage.get('wallet_type') is None:
             self.storage.put('wallet_type', self.wallet_type, True)
 
+    #demurrage function by Joe White <joe@freicoin.us>
+    #function may be a bit excessive in length, but this was rolled out
+    #at a rapid pace. optimizations will come later
+    def demurrage(self, oldValue, inputHeight):
+	#variables that need to be set
+	#this will be the value after demurrage
+        self.newValue = 0
+	#this will be the highest blockchain_headers (either you or the server)
+	self.currentHeight = 0
+	#the wallets blockchain_headers height
+	self.localHeight = self.network.get_local_height() + 1 #may need to be + 1
+	#the server's blockchain_headers height
+	self.serverHeight = self.network.get_server_height() + 1
+
+	#bring it to 121 decimal places for freicoin demurrage precision
+	#oldValue = oldValue * (10 ** 121)
+	#round back down so we can get the tx to a better state
+	#oldValue = round(oldValue, 8)
+
+        #checks for the longest chain report to give most accurate and rapid demurrage reading
+	#checks to see who has the longest blockchain_headers, our local wallet, or the server
+	if (self.localHeight >= self.serverHeight):
+		#we have the longest blockchain_headers on our local wallet, we will use that
+		#this is the highest blockchain_headers block count, we have the longest chain
+		currentHeight = self.localHeight
+	#otherwise, we can assume that the server has the longest blockchain_headers, we will use that
+	else:
+		#set the current height, the server has the highest blockchain_headers block count,
+		#they have the longest height. We will use their blockheight for demurrage.
+		#this will allow the user to have no worries that their funds will go "poof"
+		#once their wallet updates to the latest block. It would be embarassing to be
+		#1-2 coins off from a purchase because you didn't get demurrage fee updates in time
+		currentHeight = self.serverHeight
+
+        #makes sure we aren't going in reverse and adding coins
+	if (currentHeight > inputHeight):
+		#the actual demurrage function
+		#reference:  described by https://github.com/freicoin/freicoin-old/wiki/How-to-properly-handle-demurrage-in-applications
+		#$new_value = $old_value * (1 - 2**-20)**($new_height - $old_height)
+		newValueInKria = oldValue * (1 - 2 **-20)**(currentHeight - inputHeight)
+
+		#the value insub- Kria (or satoshi)
+		newValue = newValueInKria # / 100000000
+
+		#the value rounded to kria (satoshi)
+		newValue = math.floor(newValue)
+
+		#debug info for for me
+		print(str(oldValue) + "/" + str(newValue) + "-" + str(inputHeight) + "/" + str(currentHeight))
+
+		#return the new value of the coins post demurrage
+		return newValue
+	else:
+
+                return oldValue
+
+		#return the old value of the coins as there is a problem or it is the first block
+		#this is so we don't make them have coins ADDED to their balance when going in reverse!
+		#while fun, it's not a good idea to do that kinda thing on a production item.
+		#but, there are many april fools jokes that could be played with this function if you
+		#do it right. It could even potentially be used to create a simple pegged altcoin based
+		#right upon freicoin.
+
+		#proposal would be to have the clients send transactions with a shared decimal place
+		#for the coins as an indicator it is a "pegged" coin based on freicoin as is
+		#we simply need to add the value of the other party in our signature
+		#we should be able to do that now. or very soon. 
+
+	#               walletaddy issuingsever  <-fee  <-fee addy    ch's enddigits  coinName      coins in tx  total coins      verify its real
+    def peggedCoin(self, address, clearingHouse, chFee, chFeeAddress, chMagicNumbers, currencyName, totalThisTx, allCoinsEver,  signedMessage):
+
+#address: the wallet address you want to claim coins for. The clearing house will scan for the address sent to you
+#	 your pegged coins
+#clearingHouse: The issuing server, the ones that will process the transaction. the ones that do the work! They get paid.
+#chFee: The clearing house's fee. This is what they charge to issue your pegged coin.
+#chFeeAddress: The predefined address for the clearing house fee to go to. this triggers part of the scan process.
+#chMagicNumbers: this is a unique 8 decimal place value. 
+#currencyName: the unique name of your currency
+#totalThisTx: total coins in this transaction
+#allCoinsEver: all the coins ever in this pegged coin. This will allow you to have a proportional system with the 8 digits
+
+
+
+	
+    	self.value = self.get_addr_balance(self, address)
+	self.totalThisTx = totalThisTx
+
+	return address, self.value, self.totalThisTx
+
 
     def load_transactions(self):
         self.transactions = {}
@@ -465,6 +554,9 @@ class Abstract_Wallet(object):
                 self.spent_outputs.append(key)
 
     def get_addr_balance(self, address):
+	#added for demurrage accounting
+	newValue = 0
+
         #assert self.is_mine(address)
         h = self.history.get(address,[])
         if h == ['*']: return 0,0
@@ -482,6 +574,9 @@ class Abstract_Wallet(object):
 
         for tx_hash, tx_height in h:
             tx = self.transactions.get(tx_hash)
+	    #added for demurrage accounting
+	    inputHeight = tx_height
+
             if not tx: continue
             v = 0
 
@@ -490,14 +585,18 @@ class Abstract_Wallet(object):
                 if addr == address:
                     key = item['prevout_hash']  + ':%d'%item['prevout_n']
                     value = self.prevout_values.get( key )
+		    #added for demurrage accounting
+		    newValue = self.demurrage(value, item['prevout_n'])
+
                     if key in received_coins:
-                        v -= value
+                        v -= newValue
 
             for i, (addr, value) in enumerate(tx.get_outputs()):
                 key = tx_hash + ':%d'%i
                 if addr == address:
-                    v += value
-
+                    #added for demurrage accounting
+                    newValue = self.demurrage(value, inputHeight)
+                    v += newValue
             if tx_height:
                 c += v
             else:
@@ -548,7 +647,12 @@ class Abstract_Wallet(object):
                 if tx is None: raise Exception("Wallet not synchronized")
                 is_coinbase = tx.inputs[0].get('prevout_hash') == '0'*64
                 for i, (address, value) in enumerate(tx.get_outputs()):
-                    output = {'address':address, 'value':value, 'prevout_n':i}
+
+		    #add demurrage accounting functions
+		    inputHeight = i
+    		    newValue = int(self.demurrage(value, inputHeight))
+		    #update for demurrage accounting
+                    output = {'address':address, 'value':newValue, 'prevout_n':i}
                     if address != addr: continue
                     key = tx_hash + ":%d"%i
                     if key in self.spent_outputs: continue
@@ -704,8 +808,10 @@ class Abstract_Wallet(object):
             fee = MIN_RELAY_TX_FEE
         return fee
 
+#debug
     def make_unsigned_transaction(self, outputs, fixed_fee=None, change_addr=None, domain=None, coins=None ):
         # check outputs
+        print(outputs)
         for type, data, value in outputs:
             if type == 'op_return':
                 assert len(data) < 41, "string too long"

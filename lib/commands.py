@@ -22,6 +22,7 @@ import copy
 from util import print_msg, format_satoshis, print_stderr
 from bitcoin import is_valid, hash_160_to_bc_address, hash_160
 from decimal import Decimal
+from math import floor
 import bitcoin
 from transaction import Transaction
 
@@ -144,9 +145,12 @@ class Commands:
         return self.network.synchronous_get([ ('blockchain.address.get_history',[addr]) ])[0]
 
     def listunspent(self):
+#debug
         l = copy.deepcopy(self.wallet.get_unspent_coins())
+	#updates for freicoin demurrage
         for i in l: i["value"] = str(Decimal(i["value"])/100000000)
-        return l
+#        for i in l: i["value"] = str(round((Decimal(i["value"])/(10 ** 121)/100000000), 8))
+	return l
 
     def getaddressunspent(self, addr):
         return self.network.synchronous_get([ ('blockchain.address.listunspent',[addr]) ])[0]
@@ -209,20 +213,30 @@ class Commands:
         out['pubkeys'] = self.wallet.get_public_keys(addr)
         return out
 
+#debug
     def getbalance(self, account= None):
         if account is None:
             c, u = self.wallet.get_balance()
         else:
             c, u = self.wallet.get_account_balance(account)
 
-        out = { "confirmed": str(Decimal(c)/100000000) }
-        if u: out["unconfirmed"] = str(Decimal(u)/100000000)
+	#updates for freicoin demurrage
+	out = { "confirmed": str(Decimal(c)/100000000) }
+	if u: out["unconfirmed"] = str(Decimal(u)/100000000)
+        #out = { "confirmed": str(round((Decimal(c)/(10 ** 121)/100000000), 8)) }
+        #if u: out["unconfirmed"] = str(round((Decimal(c)/(10 ** 121)/100000000), 8))
         return out
 
     def getaddressbalance(self, addr):
         out = self.network.synchronous_get([ ('blockchain.address.get_balance',[addr]) ])[0]
+
+	#updates for freicoin demurrage
         out["confirmed"] =  str(Decimal(out["confirmed"])/100000000)
         out["unconfirmed"] =  str(Decimal(out["unconfirmed"])/100000000)
+
+	#out["confirmed"] =  str(round((Decimal(out["confirmed"])/(10 ** 121)/100000000), 8))
+	#out["unconfirmed"] =  str(round((Decimal(out["unconfirmed"])/(10 ** 121)/100000000), 8))
+
         return out
 
     def getproof(self, addr):
@@ -269,16 +283,16 @@ class Commands:
     def _mktx(self, outputs, fee = None, change_addr = None, domain = None):
         for to_address, amount in outputs:
             if not is_valid(to_address):
-                raise Exception("Invalid Bitcoin address", to_address)
+                raise Exception("Invalid FreiCoin address", to_address)
 
         if change_addr:
             if not is_valid(change_addr):
-                raise Exception("Invalid Bitcoin address", change_addr)
+                raise Exception("Invalid FreiCoin address", change_addr)
 
         if domain is not None:
             for addr in domain:
                 if not is_valid(addr):
-                    raise Exception("invalid Bitcoin address", addr)
+                    raise Exception("invalid FreiCoin address", addr)
 
                 if not self.wallet.is_mine(addr):
                     raise Exception("address not in wallet", addr)

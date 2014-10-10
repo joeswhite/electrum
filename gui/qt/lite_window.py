@@ -8,7 +8,7 @@ try:
     import PyQt4.QtCore as QtCore
 
 except ImportError:
-    print "You need to have PyQT installed to run Electrum in graphical mode."
+    print "You need to have PyQT installed to run FreiLectrum in graphical mode."
     print "If you have pip installed try 'sudo pip install pyqt' if you are on Debian/Ubuntu try 'sudo apt-get install python-qt4'."
     sys.exit(0)
 
@@ -37,7 +37,12 @@ import shutil
 
 from util import *
 
+#debug
+#update for freicoin demurrage accounting
+#str(round((Decimal(out["confirmed"])/(10 ** 121)/100000000), 8))
 bitcoin = lambda v: v * 100000000
+#bitcoin = lambda v: (Decimal(v * (10 ** 121), 8))
+
 
 def IconButton(filename, parent=None):
     pixmap = QPixmap(filename)
@@ -140,7 +145,7 @@ class MiniWindow(QDialog):
 
         # Bitcoin address code
         self.address_input = QLineEdit()
-        self.address_input.setPlaceholderText(_("Enter a Bitcoin address or contact"))
+        self.address_input.setPlaceholderText(_("Enter a FreiCoin address or contact"))
         self.address_input.setObjectName("address_input")
 
         self.address_input.setFocusPolicy(Qt.ClickFocus)
@@ -252,7 +257,7 @@ class MiniWindow(QDialog):
         self.toggle_receiving_layout(show_hist)
         
         self.setWindowIcon(QIcon(":icons/electrum.png"))
-        self.setWindowTitle("Electrum")
+        self.setWindowTitle("FreiLectrum")
         self.setWindowFlags(Qt.Window|Qt.MSWindowsFixedSizeDialogHint)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.setObjectName("main_window")
@@ -355,24 +360,29 @@ class MiniWindow(QDialog):
         self.amount_input_changed(self.amount_input.text())
 
     def set_balances(self, btc_balance):
-        """Set the bitcoin balance and update the amount label accordingly."""
+        """Set the FreiCoin balance and update the amount label accordingly."""
         self.btc_balance = btc_balance
         quote_text = self.create_quote_text(btc_balance)
         if quote_text:
             quote_text = "(%s)" % quote_text
 
+        #amount = self.actuator.g.format_amount(btc_balance)
+	#updates for freicoin demurrage
         amount = self.actuator.g.format_amount(btc_balance)
+
         unit = self.actuator.g.base_unit()
 
         self.balance_label.set_balance_text(amount, unit, quote_text)
-        self.setWindowTitle("Electrum %s - %s %s" % (electrum_version, amount, unit))
+        self.setWindowTitle("FreiLectrum %s - %s %s" % (electrum_version, amount, unit))
 
     def amount_input_changed(self, amount_text):
-        """Update the number of bitcoins displayed."""
+        """Update the number of FreiCoins displayed."""
         self.check_button_status()
 
         try:
-            amount = D(str(amount_text)) * (10**self.actuator.g.decimal_point)
+	    #updates for freicoin demurrage
+            #amount = D(str(amount_text)) * (10**self.actuator.g.decimal_point)
+            amount = D(str(amount_text)) * (self.actuator.g.decimal_point)
         except decimal.InvalidOperation:
             self.balance_label.show_balance()
         else:
@@ -385,7 +395,7 @@ class MiniWindow(QDialog):
 
     def create_quote_text(self, btc_balance):
         """Return a string copy of the amount fiat currency the 
-        user has in bitcoins."""
+        user has in FreiCoins."""
         from electrum.plugins import run_hook
         r = {}
         run_hook('get_fiat_balance_text', btc_balance, r)
@@ -398,9 +408,11 @@ class MiniWindow(QDialog):
             self.amount_input.setText("")
 
     def check_button_status(self):
-        """Check that the bitcoin address is valid and that something
+        """Check that the FreiCoin address is valid and that something
         is entered in the amount before making the send button clickable."""
         try:
+	    #updates for freicoin demurrage
+            #value = D(str(self.amount_input.text())) * (10**self.actuator.g.decimal_point)
             value = D(str(self.amount_input.text())) * (10**self.actuator.g.decimal_point)
         except decimal.InvalidOperation:
             value = None
@@ -457,7 +469,7 @@ class MiniWindow(QDialog):
 
 
     def the_website(self):
-        webbrowser.open("http://electrum.org")
+        webbrowser.open("http://FreiCoin.US")
 
 
     def toggle_receiving_layout(self, toggle_state):
@@ -502,7 +514,7 @@ class BalanceLabel(QLabel):
                 
 
     def set_balance_text(self, amount, unit, quote_text):
-        """Set the amount of bitcoins in the gui."""
+        """Set the amount of freicoins in the gui."""
         if self.state == self.SHOW_CONNECTING:
             self.state = self.SHOW_BALANCE
 
@@ -573,7 +585,7 @@ class ReceivePopup(QDialog):
         self.close()
 
     def setup(self, address):
-        label = QLabel(_("Copied your Bitcoin address to the clipboard!"))
+        label = QLabel(_("Copied your FreiCoin address to the clipboard!"))
         address_display = QLineEdit(address)
         address_display.setReadOnly(True)
         resize_line_edit_width(address_display, address)
@@ -583,7 +595,7 @@ class ReceivePopup(QDialog):
         main_layout.addWidget(address_display)
 
         self.setMouseTracking(True)
-        self.setWindowTitle("Electrum - " + _("Receive Bitcoin payment"))
+        self.setWindowTitle("FreiLectrum - " + _("Receive FreiCoin payment"))
         self.setWindowFlags(Qt.Window|Qt.FramelessWindowHint|
                             Qt.MSWindowsFixedSizeDialogHint)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
@@ -600,7 +612,7 @@ class ReceivePopup(QDialog):
 
 class MiniActuator:
     """Initialize the definitions relating to themes and 
-    sending/receiving bitcoins."""
+    sending/receiving freicoins."""
     
     
     def __init__(self, main_window):
@@ -674,7 +686,7 @@ class MiniActuator:
         s.start()
         w = QDialog()
         w.resize(200, 70)
-        w.setWindowTitle('Electrum')
+        w.setWindowTitle('FreiLectrum')
         l = QLabel(_('Sending transaction, please wait.'))
         vbox = QVBoxLayout()
         vbox.addWidget(l)
@@ -690,15 +702,15 @@ class MiniActuator:
 
 
     def send(self, address, amount, parent_window):
-        """Send bitcoins to the target address."""
+        """Send freicoins to the target address."""
         dest_address = self.fetch_destination(address)
 
         if dest_address is None or not is_valid(dest_address):
             QMessageBox.warning(parent_window, _('Error'), 
-                _('Invalid Bitcoin Address') + ':\n' + address, _('OK'))
+                _('Invalid FreiCoin Address') + ':\n' + address, _('OK'))
             return False
-
-        amount = D(unicode(amount)) * (10*self.g.decimal_point)
+	#changes for freicoin demurrage
+        amount = D(unicode(amount)) * (10 ** self.g.decimal_point)
         print "amount", amount
         return
 

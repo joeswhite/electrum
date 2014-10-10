@@ -32,7 +32,7 @@ class Blockchain(threading.Thread):
         self.lock = threading.Lock()
         self.local_height = 0
         self.running = False
-        self.headers_url = 'http://headers.electrum.org/blockchain_headers'
+        self.headers_url = 'http://freicoin.us/blockchain_headers'
         self.set_local_height()
         self.queue = Queue.Queue()
 
@@ -256,7 +256,7 @@ class Blockchain(threading.Thread):
                     last = h
  
         nActualTimespan = last.get('timestamp') - first.get('timestamp')
-        nTargetTimespan = 14*24*60*60
+        nTargetTimespan = 9*60 #diff adjusts every 9 blocks
         nActualTimespan = max(nActualTimespan, nTargetTimespan/4)
         nActualTimespan = min(nActualTimespan, nTargetTimespan*4)
 

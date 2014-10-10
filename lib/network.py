@@ -4,23 +4,15 @@ from bitcoin import *
 import interface
 from blockchain import Blockchain
 
-DEFAULT_PORTS = {'t':'50001', 's':'50002', 'h':'8081', 'g':'8082'}
+DEFAULT_PORTS = {'t':'50011', 's':'50012', 'h':'9009', 'g':'9010'}
 
-DEFAULT_SERVERS = {
-    'electrum.be':DEFAULT_PORTS,
-    'electrum.drollette.com':{'t':'50001', 's':'50002'},
-    'erbium1.sytes.net':{'t':'50001', 's':'50002'},
-    'ecdsa.net':{'t':'50001', 's':'110'},
-    'eco-electrum.ddns.net':{'t': '50001', 's': '50002', 'h': '80', 'g': '443'},
-    'electrum0.electricnewyear.net':{'t':'50001', 's':'50002'},
-    'kirsche.emzy.de':{'t':'50001', 's':'50002', 'h':'8081'},
-    'electrum2.hachre.de':DEFAULT_PORTS,
-    'electrum.hsmiths.com':DEFAULT_PORTS,
-    'EAST.electrum.jdubya.info':DEFAULT_PORTS,
-    'WEST.electrum.jdubya.info':DEFAULT_PORTS,
+"""
+this is how a full node with nonstandard prots looks like in servers list
     'electrum.no-ip.org':{'t':'50001', 's':'50002', 'h':'80', 'g':'443'},
-    'electrum.thwg.org':DEFAULT_PORTS,
-    'us.electrum.be':DEFAULT_PORTS,
+"""
+DEFAULT_SERVERS = {
+    'freicoin.us':DEFAULT_PORTS,
+    '127.0.0.1' :DEFAULT_PORTS,
 }
 
 DISCONNECTED_RETRY_INTERVAL = 60

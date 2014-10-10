@@ -25,7 +25,9 @@ class AmountEdit(MyLineEdit):
         self.help_palette = QPalette()
 
     def decimal_point(self):
-        return 8
+	#updates for freicoin demurrage
+#        return 121
+	return 8
 
     def numbify(self):
         text = unicode(self.text()).strip()
@@ -71,20 +73,32 @@ class BTCAmountEdit(AmountEdit):
 
     def _base_unit(self):
         p = self.decimal_point()
-        assert p in [2, 5, 8]
+	#updates for freicoin demurrage
+        assert p in [1, 5, 8]
         if p == 8:
-            return 'BTC'
+            return 'FRC'
         if p == 5:
-            return 'mBTC'
-        if p == 2:
-            return 'bits'
+            return 'mFRC'
+        if p == 1:
+            return 'kria'
         raise Exception('Unknown base unit')
+#        assert p in [121, 126, 129]
+#        if p == 129:
+#            return 'FRC'
+#        if p == 126:
+#            return 'mFRC'
+#        if p == 121:
+#            return 'kria'
+#        raise Exception('Unknown base unit')
 
+
+#debug
     def get_amount(self):
         try:
             x = Decimal(str(self.text()))
         except:
             return None
+	#edits for freicoin demurrage
         p = pow(10, self.decimal_point())
         return int( p * x )
 
@@ -92,8 +106,9 @@ class BTCAmountEdit(AmountEdit):
         if amount is None:
             self.setText("")
             return
-
+        #updates for freicoin demurrage
         p = pow(10, self.decimal_point())
         x = amount / Decimal(p)
+	print(x)
         self.setText(str(x))
 
