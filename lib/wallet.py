@@ -240,7 +240,7 @@ class Abstract_Wallet(object):
 		newValue = math.floor(newValue)
 
 		#debug info for for me
-		print(str(oldValue) + "/" + str(newValue) + "-" + str(inputHeight) + "/" + str(currentHeight))
+		#print(str(oldValue) + "/" + str(newValue) + "-" + str(inputHeight) + "/" + str(currentHeight))
 
 		#return the new value of the coins post demurrage
 		return newValue
