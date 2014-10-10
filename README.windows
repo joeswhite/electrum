@@ -1,0 +1,43 @@
+Running FreiLectrum from source on windows
+
+find out if you are using 32 or 64 bit windows and install according to bits
+Download/install python2.7 for windows
+https://www.python.org/download/releases/2.7/
+
+Download/install pyqt4 for python 2.7 for windows (about 65 megs) http://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt 
+x64: PyQt4-4.10.4-gpl-Py2.7-Qt4.8.6-x64.exe
+
+move socks.py (socksipy) from freilectrum/share to freilectrum root folder
+
+move ez_setup.py from freilectrum/share to your python 2.7 Scripts folder (usually C:\Python27\Scripts)
+
+open a command prompt
+
+go to your Python27 install folder (usually as below)
+cd C:\python2.7
+
+python Scripts/ez_install.py
+cd Scriptscripts
+
+easy_install.exe ecdsa
+
+easy_install.exe slowaes
+
+easy_install.exe requests
+
+easy_install.exe pyasn1
+
+easy_install.exe pyasn1-modules
+
+easy_install.exe tlslite
+
+easy_install.exe pbkdf2
+
+easy_install.exe qrcode
+
+
+finally run it by opening a command prompt
+change to your freilectrum install folder
+
+ALWAYS run freilectrum via python 27 *FROM YOUR FREILECTRUM INSTALL FOLDER!!!) (usually as below)
+C:\Python27\python.exe freilectrum

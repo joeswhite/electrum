@@ -13,8 +13,14 @@ FreiLectrum pre-alpha v0.001 should work as is, however BACK UP YOUR CURRENT ELE
 
 There has not yet been testing of the android wallet, however it should work. again BACK UP YOUR CURRENT ELECTRUM CLIENT AND WALLET
 
+BLOCK EXPLORERS HAVE NOT YET BEEN CHANGED. ANYONE WANTING THIER EXPLORER IN FreiLectrum PLEASE OPEN AN ISSUE ON THIS GITHUB
+
 1. GETTING STARTED
 ------------------
+
+To run FreiLectrum from source in windows follow:
+   README.windows
+  
 
 To run FreiLectrum from this directory, just do:
 
