@@ -17,7 +17,7 @@ go to your Python27 install folder (usually as below)
 cd C:\python2.7
 
 python Scripts/ez_install.py
-cd Scriptscripts
+cd Scripts
 
 easy_install.exe ecdsa
 
