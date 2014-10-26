@@ -177,7 +177,25 @@ class Abstract_Wallet(object):
         self.prevout_values = {}     # my own transaction outputs
         self.spent_outputs = []
         # spv
-        self.verifier = None
+        self.verifier = 
+        
+        
+        
+        
+       
+        from network import Network as NEtwork
+        self.network = NEtwork()
+        
+
+        self.localHeight = 0
+        self.localHeight = self.network.get_local_height() + 1 #may need to be + 1
+        #the server's blockchain_headers height
+        self.serverHeight = 0
+        self.serverHeight = self.network.get_server_height() + 1
+
+        
+        
+        
         # there is a difference between wallet.up_to_date and interface.is_up_to_date()
         # interface.is_up_to_date() returns true when all requests have been answered and processed
         # wallet.up_to_date is true when the wallet is synchronized (stronger requirement)
