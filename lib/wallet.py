@@ -177,7 +177,7 @@ class Abstract_Wallet(object):
         self.prevout_values = {}     # my own transaction outputs
         self.spent_outputs = []
         # spv
-        self.verifier = 
+        self.verifier = None
         
         
         
